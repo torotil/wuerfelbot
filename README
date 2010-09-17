@@ -1,0 +1,71 @@
+ZWIRBELTIER
+
+===Lizenz===
+Sämtlicher Code für diesen Bot steht unter der Lizenz GPLv3.
+Der gesamte Lizenztext sollte sich im selben Verzeichnis
+in der Datei „gpl-3.0.txt“ befinden. Alternativ kann er unter
+http://www.gnu.org/licenses/gpl-3.0.txt heruntergeladen werden.
+
+===Autor===
+Roman Zimmermann <roman.zimmermann@gmx.at>
+
+===Voraussetzungen===
+ * Python 2.6 (könnte auch unter 2.7 funktionieren) 
+
+===Starten und Kompilieren des Bots===
+ * Ein Spiel lässt sich einfach mittels "make game" starten.
+ * Ein Kompilieren des Bots ist nicht notwendig.
+ * Der Bot spielt unter dem Namen "zwiesel" 
+
+===Konfiguration===
+Die Konfiguration befindet sich in der Datei main.py.
+Gegebenenfalls ist der Hostname (derzeit 'wettbewerb.linuxmagazin.de')
+und/oder der Port (derzeit 3333) anzupassen.
+
+===Funktionsweise des Bots===
+Der Bot benutzt eine statische Entscheidungstabelle, in der für jeden
+Spielstand (Punkte zu Beginn der Runde, aktuelle Punkte, Punkte des Gegners)
+steht, ob gewürfelt oder abgewartet werden soll. Es kommt also nur noch auf
+eine richtige Tabelle an. Da die Tabelle vor dem Wettbewerb erstellt wird,
+ist die benötigte Rechenzeit zum Berechnen nicht so wichtig.
+
+Der für den Wettbewerb benutzte Bot ist unter "zwirbeltier.pickle" abgespeichert.
+Während des Wettbewerbs wird nur noch der Code der Dateien main.py, pickled.py
+und remote.py verwendet. Der Rest ist die Infrastruktur zum erstellen der
+Entscheidungstabelle.
+
+===Entwicklung des Bots===
+Der ideale Bot entscheidet sich bei jedem Spielzug so, dass er seine
+Gewinnwahrscheinlichkeit maximiert. Das kann er natürlich nur unter
+der Voraussetzung, dass er die Taktik des Gegners kennt.
+
+nemesis.py: erstellt für statische Bots (der Spielverlauf bis zum Beginn
+des Zuges ist egal) den idealen Gegner (also den Gegner mit der größten
+Gewinnwahrscheinlichkeit).
+Wie? Es werden einfach alle möglichen Spielstände (etwa 62.500) durchgespielt.
+Diese Funktion kann man einerseits dazu verwenden gute Bots zu generieren,
+andererseits hat man damit einen Anhaltspunkt: Wie gut kann man gegen Bot X
+abschneiden? Maximal so gut wie sein Nemesis.
+Außerdem kann man den Nemesis von einem gewichteten Misch-Bot berechnen
+(class nemesis.MultiNemesis).
+
+benchmark.py: Lässt zwei Bots virtuell gegeneinander antreten und errechnet
+die Gewinnwahrscheinlichkeiten. Außerdem bietet es eine bequeme Möglichkeit
+einen Bot gleich gegen mehrere andere antreten lassen.
+
+game_static.py: Enthält ein paar Funktionen zum Berechnen von Wahrscheinlichkeiten,
+die aber nicht mehr verwendet werden.
+
+Der Bot für den Wettbewerb ist der MultiNemesis von:
+9*OptiRoll + 2*nemesis_alwaysroll + AlwaysRoll
+Er wird automatisch generiert wenn man "python nemesis.py" ausführt.
+
+Benchmark von zwirbeltier.pickle (gewonnene Spiele aus 10.000):
+                             Optimum    zwirbeltier.pickle
+AlwaysRoll                    6972        6825
+Roll16                        5401        5356
+OptiRoll                      5352        5312
+nemesis_alwaysroll.pickle	  5016        4980
+
+Der Nemesis von zwirbeltier.pickle gewinnt etwa 5064/10000 Spiele.
+
